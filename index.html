@@ -12,8 +12,37 @@
 </head>
 <body>
 <section class="hero is-info">
+  <div class="hero-head">
+    <nav class="navbar">
+      <div class="container">
+        <div class="navbar-brand">
+          <a class="navbar-item">
+            <img src="./images/logo.png" alt="Logo">
+          </a>
+          <span class="navbar-burger burger">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        </div>
+        <div class="navbar-menu">
+          <div class="navbar-end">
+            <span class="navbar-item">
+              <a class="button is-info is-inverted" href="https://github.com/jschatz1/vueglue" target="_blank">
+                <span class="icon">
+                  <i class="fab fa-github"></i>
+                </span>
+                <span>Code</span>
+              </a>
+            </span>
+          </div>
+        </div>
+      </div>
+    </nav>
+  </div>
+
   <div class="hero-body">
-    <div class="container">
+    <div class="container has-text-centered">
       <h1 class="title">
         VueGlue
       </h1>
@@ -43,7 +72,6 @@
         </aside>
       </div>
       <div class="column">
-        <a href="https://github.com/jschatz1/vueglue/tree/master/examples">See the code</a>
         <div class="current-app">
           <div id="app"></div>
         </div>
@@ -51,10 +79,26 @@
     </div>
   </div>
 </section>
+<footer class="footer">
+  <div class="content has-text-centered">
+    <p>
+      <strong>VueGlue</strong> by <a href="http://jacobschatz.com">Jacob Schatz</a>. The source code is licensed
+      <a href="http://opensource.org/licenses/mit-license.php">MIT</a>. The website content
+      is licensed <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/">CC BY NC SA 4.0</a>.
+    </p>
+    <p>
+      <a href="https://bulma.io/" target="_blank">
+        <img src="./images/made-with-bulma.png" width="100px">
+      </a>
+    </p>
+  </div>
+</footer>
 <script src="./js/shared.js"></script>
 <script class="todos-script" src="./js/todos.js"></script>
 <script type="text/javascript">
 document.addEventListener('DOMContentLoaded', function() {
+  var navBurger = document.getElementsByClassName('navbar-burger')[0];
+  var navMenu = document.getElementsByClassName('navbar-menu')[0];
   var counterEl = document.getElementsByClassName('counter')[0];
   var todosEl = document.getElementsByClassName('todos')[0];
   var appContainer = document.getElementsByClassName('current-app')[0];
@@ -86,6 +130,15 @@ document.addEventListener('DOMContentLoaded', function() {
     script.src = './js/todos.js';
     script.classList.add('todos-script');
     document.body.appendChild(script);
+  });
+  navBurger.addEventListener('click', function() {
+    if(navBurger.classList.contains('is-active')) {
+      navBurger.classList.remove('is-active');
+      navMenu.classList.remove('is-active');
+    } else {
+      navBurger.classList.add('is-active');
+      navMenu.classList.add('is-active');
+    }
   });
 });
 </script>
