@@ -1,1 +1,1 @@
-[Vueglue](http://vueglue.com)
+[VueCommander](http://vuecommander.com)
