@@ -1,1 +1,1 @@
-[Vueglue](https://vueglue.com)
+[Vueglue](http://vueglue.com)
