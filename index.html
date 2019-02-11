@@ -79,6 +79,179 @@
     </div>
   </div>
 </section>
+<section class="section">
+  <div class="container">
+    <div class="content">
+      <h2>Getting Started</h2>
+      <p>The <code>command</code> pattern encapsulates a single unit of action. When you go to a restaurant and the server takes your order. Each slip of paper (what we'll call a <code>command</code>) contains specific instructions. You don't talk to the chef directly.</p>
+      <p>Once the chef receives your order, they may queue it up with the other orders. They'll read your order once they have finished their current ones. If the chef makes a mistake, they can easily undo that mistake by looking at the order and fixing it. The command pattern can easily undo. It can also queue up executions before making them.</p>
+      <p>In the same way that you wouldn't talk to the chef directly, your GUI should not access or run business logic directly.</p>
+      <p>With <code>VueCommander</code> your Vue component will dispatch notifications using a built in observer pattern. You'll name your events based on the command you'll be executing (not the UI interaction). e.g: <code>hello.updatemessage</code> is good, <code>hello.messagebuttonclicked</code> is bad.</p>
+      <p>With VueCommander you'll map your events to commands in your <code>context</code>.
+      <p><strong>context.js</strong></p>
+      <pre>
+import Vue from 'vue';
+import VueCommander from 'vuecommander';
+import {
+  LikesCommand,
+  RetweetsCommand,
+  RepliesCommand
+} from './CountCommand';
+
+Vue.use(VueCommander);
+
+export default new VueCommander.Context({
+  'count.like': LikesCommand,
+  'count.retweets': RetweetsCommand,
+  'count.replies': RepliesCommand,
+});
+      </pre>
+      <p>You'll import your context and it will be available to all components and child components.</p>
+      <p><strong>app.js</strong></p>
+      <pre>
+import Vue from 'vue';
+import context from './Context';
+import Counter from './Counter.vue';
+
+new Vue({
+  el: '#app',
+  context: context,
+  render: h => h(Counter)
+});
+      </pre>
+      <p>In your component, you'll dispatch an event when something happens.</p>
+      <p><strong>Counter.vue</strong> (sample)</p>
+      <pre>
+&lt;template&gt;
+  ...
+        &lt;nav class=&quot;level is-mobile&quot;&gt;
+          &lt;div class=&quot;level-left&quot;&gt;
+            &lt;a class=&quot;level-item&quot; aria-label=&quot;reply&quot; @click=&quot;increaseReplies&quot;&gt;
+              &lt;span class=&quot;icon is-small&quot;&gt;
+                &lt;i class=&quot;fas fa-reply&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;
+              &lt;/span&gt;
+            &lt;/a&gt;
+            &lt;span class=&quot;level-item&quot;&gt;{{replies}}&lt;/span&gt;
+            &lt;a class=&quot;level-item&quot; aria-label=&quot;retweet&quot; @click=&quot;increaseRetweets&quot;&gt;
+              &lt;span class=&quot;icon is-small&quot;&gt;
+                &lt;i class=&quot;fas fa-retweet&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;
+              &lt;/span&gt;
+            &lt;/a&gt;
+            &lt;span class=&quot;level-item&quot;&gt;{{retweets}}&lt;/span&gt;
+            &lt;a class=&quot;level-item&quot; aria-label=&quot;like&quot; @click=&quot;increaseLikes&quot;&gt;
+              &lt;span class=&quot;icon is-small&quot;&gt;
+                &lt;i class=&quot;fas fa-heart&quot; aria-hidden=&quot;true&quot;&gt;&lt;/i&gt;
+              &lt;/span&gt;
+            &lt;/a&gt;
+            &lt;span class=&quot;level-item&quot;&gt;{{likes}}&lt;/span&gt;
+          &lt;/div&gt;
+        &lt;/nav&gt;
+  ...
+&lt;/template&gt;
+&lt;script&gt;
+import CountModel from './CountModel';
+export default {
+  data() {
+    return CountModel;
+  },
+  methods: {
+    increaseLikes() {
+      this.$context.events.notify('count.like');
+    },
+    increaseRetweets() {
+      this.$context.events.notify('count.retweets');
+    },
+    increaseReplies() {
+      this.$context.events.notify('count.replies');
+    }
+  }
+}
+&lt;/script&gt;
+      </pre>
+      VueCommander will look through your <code>context</code> for that event. If you have mapped that event to a <code>command</code>, VueCommander will create a new instance of your command and run <code>execute</code>, which cannot take any parameters. Your <code>command</code> will also be instantiated with the event that was called so you can have the data related to event available within the command.</p>
+      <p><strong>CountCommands.js</strong></p>
+      <pre>
+import CountModel from './CountModel';
+
+export class LikesCommand {
+  constructor(e) {
+    this.event; // not needed here but `this.event.data` is the data from the event
+  }
+
+  execute() {
+    CountModel.likes += 1;
+  }
+}
+      </pre>
+      <p>You'll create <code>models</code> which are singleton units of state.</p> 
+      <p><strong>CountModel.js</strong></p>
+      <pre>
+export default {
+  likes: 0,
+  retweets: 0,
+  replies: 0,
+}
+      </pre>
+      <p>Your models can be imported into your commands and you can modify them within your <code>execute</code> methods. Because Vuejs automatically tracks changes within objects you can set your model as part or all of your <code>data</code> attribute of your component.</p>
+      <p><strong>Counter.vue</strong> (sample)</p>
+      <pre>
+...
+import CountModel from './CountModel';
+export default {
+  data() {
+    return CountModel;
+  },
+...
+      </pre>
+
+      <p>Your component will no longer be tightly coupled to business logic.</p>
+      <p>Each <code>execute</code> call will be tracked in a <code>history</code> array. Because a command is a single unit of action, you can easily undo them. If you add a <code>saveState</code> method and a <code>undo</code> method to your commands, they can take care of undoing themselves. You'll write the code for <code>saveState</code> which will get called before <code>execute</code>. You'll also write the code to the <code>undo</code> method. Let's update our <code>LikesCommand</code>.</p>
+      <p><strong>CountCommands</strong></p>
+      <pre>
+import CountModel from './CountModel';
+
+export class LikesCommand {
+  constructor() {
+    this.backup;
+  }
+
+  execute() {
+    CountModel.likes += 1;
+  }
+
+  saveState() {
+    this.backup = CountModel.likes;
+  }
+
+  undo() {
+    CountModel.likes = this.backup;
+  }
+}
+      </pre>
+      <p>Within your component you can now call `undo`. Although it's better to create a full <code>undoCommand</code>.</p>
+      <p><strong>Counter.vue</strong> (sample)</p>
+      <pre>
+methods: {
+  increaseLikes() {
+    this.$context.events.notify('count.like');
+  },
+  increaseRetweets() {
+    this.$context.events.notify('count.retweets');
+  },
+  increaseReplies() {
+    this.$context.events.notify('count.replies');
+  },
+  undo() {
+    if(this.$context.history.length) {
+      this.$context.history.pop().undo();
+    }
+  }
+}
+      </pre>
+      <p>That's all for now. Go check out the <a href="https://github.com/jschatz1/vuecommander/tree/master/examples">examples</a> for a few demo implementations of VueCommander. Also read up on the command and observer design patterns.</p>
+    </div>
+  </div>
+</section>
 <footer class="footer">
   <div class="content has-text-centered">
     <p>
