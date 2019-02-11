@@ -2,8 +2,92 @@
 <html>
 <head>
   <title>VueGlue</title>
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.7.4/css/bulma.min.css">
+  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.1/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" crossorigin="anonymous">
+  <style type="text/css">
+    .box {
+      margin-bottom: 10px;
+    }
+  </style>
 </head>
 <body>
-<h1>VueGlue</h1>
+<section class="hero is-info">
+  <div class="hero-body">
+    <div class="container">
+      <h1 class="title">
+        VueGlue
+      </h1>
+      <h2 class="subtitle">
+        Vuejs application framework based on battle tested design patterns
+      </h2>
+    </div>
+  </div>
+</section>
+<section class="section">
+  <div class="container">
+    <h1 class="title">Examples</h1>
+    <div class="columns">
+      <div class="column is-one-third">
+        <aside class="menu">
+          <p class="menu-label">
+            Pablum
+          </p>
+          <ul class="menu-list">
+            <li>
+              <a class="counter">Counter</a>
+            </li>
+            <li>
+              <a class="todos is-active">Todos</a>
+            </li>
+          </ul>
+        </aside>
+      </div>
+      <div class="column">
+        <a href="https://github.com/jschatz1/vueglue/tree/master/examples">See the code</a>
+        <div class="current-app">
+          <div id="app"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<script src="./js/shared.js"></script>
+<script class="todos-script" src="./js/todos.js"></script>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', function() {
+  var counterEl = document.getElementsByClassName('counter')[0];
+  var todosEl = document.getElementsByClassName('todos')[0];
+  var appContainer = document.getElementsByClassName('current-app')[0];
+  var appHTML = '<div id="app"></div>';
+  counterEl.addEventListener('click', function() {
+    var todosScript = document.getElementsByClassName('todos-script')[0];
+    var script = document.createElement('script');
+    todosEl.classList.remove('is-active');
+    counterEl.classList.add('is-active');
+    todosScript.parentNode.removeChild(todosScript);
+    while (appContainer.firstChild) {
+      appContainer.removeChild(appContainer.firstChild);
+    }
+    appContainer.innerHTML = appHTML;
+    script.src = './js/counter.js';
+    script.classList.add('counter-script');
+    document.body.appendChild(script);
+  });
+  todosEl.addEventListener('click', function() {
+    var counterScript = document.getElementsByClassName('counter-script')[0];
+    var script = document.createElement('script');
+    counterEl.classList.remove('is-active');
+    todosEl.classList.add('is-active');
+    counterScript.parentNode.removeChild(counterScript);
+    while (appContainer.firstChild) {
+      appContainer.removeChild(appContainer.firstChild);
+    }
+    appContainer.innerHTML = appHTML;
+    script.src = './js/todos.js';
+    script.classList.add('todos-script');
+    document.body.appendChild(script);
+  });
+});
+</script>
 </body>
 </html>
